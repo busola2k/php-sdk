@@ -4,111 +4,149 @@ session_start();
 require '../Meli/meli.php';
 require '../configApp.php';
 
-$meli = new Meli($appId, $secretKey);
 
-if($_GET['code']) {
+// Create our Application instance (replace this with your appId and secret).
+$meli = new Meli(array(
+	'appId'  	=> 'XXXXXXXXXXXX',
+	'secret' 	=> 'XXXXXXXXXXXXXXXXXXXX',
+));
 
-	// If the code was in get parameter we authorize
-	$user = $meli->authorize($_GET['code'], $redirectURI);
+$userId = $meli -> initConnect();
 
-	// Now we create the sessions with the authenticated user
-	$_SESSION['access_token'] = $user['body']->access_token;
-	$_SESSION['expires_in'] = $user['body']->expires_in;
-	$_SESSION['refresh_token'] = $user['body']->refresh_token;
-
-	// We can check if the access token in invalid checking the time
-	if($_SESSION['expires_in'] + time() + 1 < time()) {
-		try {
-			print_r($meli->refreshAccessToken());
-		} catch (Exception $e) {
-			echo "Exception: ",  $e->getMessage(), "\n";
-		}
-	}
-
-	// We construct the item to POST
-	$item = array(
-		"title" => "Item De Teste - Por Favor, Não Ofertar! --kc:off",
-        "category_id" => "MLB257111",
-        "price" => 10,
-        "currency_id" => "BRL",
-        "available_quantity" => 1,
-        "buying_mode" => "buy_it_now",
-        "listing_type_id" => "bronze",
-        "condition" => "new",
-        "description" => array ("plain_text" => "Item de Teste. Mercado Livre's PHP SDK."),
-        "video_id" => "RXWn6kftTHY",
-        "warranty" => "12 month",
-        "pictures" => array(
-            array(
-                "source" => "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/IPhone_7_Plus_Jet_Black.svg/440px-IPhone_7_Plus_Jet_Black.svg.png"
-            ),
-            array(
-                "source" => "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/IPhone7.jpg/440px-IPhone7.jpg"
-            )
-        ),
-        "attributes" => array(
-            array(
-                "id" => "EAN",
-                "value_name" => "190198043566"
-            ),
-            array(
-                "id" => "COLOR",
-                "value_id" => "52049"
-            ),
-            array(
-                "id" => "WEIGHT",
-                "value_name" => "188g"
-            ),
-            array(
-                "id" => "SCREEN_SIZE",
-                "value_name" => "4.7 polegadas"
-            ),
-            array(
-                "id" => "TOUCH_SCREEN",
-                "value_id" => "242085"
-            ),
-            array(
-                "id" => "DIGITAL_CAMERA",
-                "value_id" => "242085"
-            ),
-            array(
-                "id" => "GPS",
-                "value_id" => "242085"
-            ),
-            array(
-                "id" => "MP3",
-                "value_id" => "242085"
-            ),
-            array(
-                "id" => "OPERATING_SYSTEM",
-                "value_id" => "296859"
-            ),
-            array(
-                "id" => "OPERATING_SYSTEM_VERSION",
-                "value_id" => "iOS 10"
-            ),
-            array(
-                "id" => "DISPLAY_RESOLUTION",
-                "value_id" => "1920 x 1080"
-            ),
-            array(
-                "id" => "BATTERY_CAPACITY",
-                "value_name" => "3980 mAh"
-            ),
-            array(
-                "id" => "FRONT_CAMERA_RESOLUTION",
-                "value_name" => "7 mpx"
-            )
-        )
-    );
+// Login or logout url will be needed depending on current user state.
+if ($userId):
 	
-	// We call the post request to list a item
-	echo '<pre>';
-	print_r($meli->post('/items', $item, array('access_token' => $_SESSION['access_token'])));
-	echo '</pre>';
+	if(isset($_REQUEST['orders_id']) == 1):
 
-} else {
+        $response = $meli -> postWithAccessToken('/orders', array('orders_id' => $_REQUEST['buyer'], 'id' => $_REQUEST['nickname']));
 
-	echo '<a href="' . $meli->getAuthUrl($redirectURI, Meli::$AUTH_URL['MLB']) . '">Login using MercadoLibre oAuth 2.0</a>';
-}
+        $_SESSION['orders_id'] = true;
 
+        header("Location: " . $meli -> getCurrentUrl(), TRUE, 302);
+
+    endif;
+
+    $user = $meli -> getWithAccessToken('/users/me');
+
+   
+	$orders = $meli -> getWithAccessToken('/orders/search/recent',   array('seller' => $user['json']['id']));
+	
+	 
+	
+
+endif;
+?>
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8"/>
+	<title>Pedidos</title>
+</head>
+<body>
+	
+	<h1>Pedidos</h1>
+	<?php if ($userId): ?>
+		<p>olá, <?php echo $user['json']['first_name'] ?></p>
+		
+		<a href="<?php echo $meli -> getLogoutUrl();?>">Sair</a>
+		
+	<h2>Orders </h2>
+	<ul>
+		
+	
+		<?php foreach ($orders['json']['results'] as &$order): ?>
+		<li>
+		
+			
+			<?php echo "<p> Numero do Pedido: ". $order[id]; "</p>"; ?>
+			
+			<?php echo "<p> Status: ". $order[status]; "</p>"; ?>
+			<?php echo "<p> Data de Criação: ". $order[date_created]; "</p>"; ?>
+			<?php echo "<p> Data de Fechamento: ". $order[date_closed]; "</p>"; ?>
+			<?php echo "<p> Moeda: ". $order[currency_id]; "</p>"; ?>
+			
+			<p><b>Dados do produto</b></p>
+			<?php echo "<p> Moeda: ". $order[order_items][0][currency_id]; "</p>"; ?>
+			<?php echo "<p> Id do Produto: ". $order[order_items][0][item][id]; "</p>"; ?>
+			<?php echo "<p> Nome do Produto: ". $order[order_items][0][item][title]; "</p>"; ?>
+			<?php echo "<p> Id da Categoria: ". $order[order_items][0][item][category_id]; "</p>"; ?>
+			<?php echo "<p> Quantidade: ". $order[order_items][0][quantity]; "</p>"; ?>
+			<?php echo "<p> Preço do Produto: ". $order[order_items][0][unit_price]; "</p>"; ?>
+			<?php echo "<p> Total do pedido: ". $order[total_amount]; "</p>"; ?>
+			
+			<p><b>Informações do Cliente</b></p>
+			<?php echo "<p> Id do Cliente: ". $order[buyer][id]; "</p>"; ?>
+			<?php echo "<p> Apelido do Cliente: ". $order[buyer][nickname]; "</p>"; ?>
+			<?php echo "<p> Email do Cliente: ". $order[buyer][email]; "</p>"; ?>
+			<?php echo "<p> Nome do Cliente: ". $order[buyer][first_name]; "</p>"; ?>
+			<?php echo "<p> Sobrenome do Cliente: ". $order[buyer][last_name]; "</p>"; ?>
+			<p><b>Telefone</b></p>
+			<?php echo "<p> Codigo de area: ". $order[buyer][phone][area_code]; "</p>"; ?>
+			<?php echo "<p> Telefone: ". $order[buyer][phone][number]; "</p>"; ?>
+			<?php echo "<p> Codigo de area: ". $order[buyer][alternative_phone][area_code]; "</p>"; ?>
+			<?php echo "<p> Telefone: ". $order[buyer][alternative_phone][number]; "</p>"; ?>
+			<p><b>Documento</b></p>
+			<?php echo "<p> Tipo: ". $order[buyer][billing_info][doc_type]; "</p>"; ?>
+			<?php echo "<p> Numero: ". $order[buyer][billing_info][doc_number]; "</p>"; ?>
+			
+			<p><b>Informações de pagamento</b></p>
+			<?php echo "<p> Id de Pagamento: ". $order[payments][0][id]; "</p>"; ?>
+			<?php echo "<p> Status: ". $order[payments][0][status]; "</p>"; ?>
+			<?php echo "<p> Valor da transação: ". $order[payments][0][transaction_amount]; "</p>"; ?>
+			<?php echo "<p> Moeda: ". $order[payments][0][currency_id]; "</p>"; ?>
+			<?php echo "<p> Data de criação: ". $order[payments][0][date_created]; "</p>"; ?>
+			<?php echo "<p> Data da Ultima Atualização: ". $order[payments][0][date_last_updated]; "</p>"; ?>
+			<?php echo "<p> Razão: ". $order[payments][0][reason]; "</p>"; ?>
+			<?php echo "<p> Detalhe de status: ". $order[payments][0][status_detail]; "</p>"; ?>
+			<?php echo "<p> Metodo de pagamento: ". $order[payments][0][payment_method_id]; "</p>"; ?>
+			<?php echo "<p> Tipo de operação: ". $order[payments][0][operation_type]; "</p>"; ?>
+			<?php echo "<p> Tipo de pagamento: ". $order[payments][0][payment_type]; "</p>"; ?>
+			<?php echo "<p> Tipo: ". $order[payments][0][id]; "</p>"; ?>
+			
+			<p><b>Informações de envio</b></p>
+			<?php echo "<p> Id de envio: ". $order[shipping][id]; "</p>"; ?>
+			<?php echo "<p> Status: ". $order[shipping][status]; "</p>"; ?>
+			<?php echo "<p> Tipo de Envio: ". $order[shipping][shipment_type]; "</p>"; ?>
+			<?php echo "<p> Data de Criação: ". $order[shipping][date_created]; "</p>"; ?>
+			<?php echo "<p> Moeda: ". $order[shipping][currency_id]; "</p>"; ?>
+			<?php echo "<p> Valor: ". $order[shipping][cost]; "</p>"; ?>
+			<?php echo "<p> Id: ". $order[shipping][receiver_address][id]; "</p>"; ?>
+			<?php echo "<p> Endereço: ". $order[shipping][receiver_address][address_line]; "</p>"; ?>
+			<?php echo "<p> Cep: ". $order[shipping][receiver_address][zip_code]; "</p>"; ?>
+			<?php echo "<p> Complemento: ". $order[shipping][receiver_address][comment]; "</p>"; ?>
+			<?php echo "<p> Nome da rua: ". $order[shipping][receiver_address][street_name]; "</p>"; ?>
+			<?php echo "<p> Nº : ". $order[shipping][receiver_address][street_number]; "</p>"; ?>
+			<?php echo "<p> Id da Cidade: ". $order[shipping][receiver_address][city][id]; "</p>"; ?>
+			<?php echo "<p> Cidade: ". $order[shipping][receiver_address][city][name]; "</p>"; ?>
+			<?php echo "<p> Id do Estado: ". $order[shipping][receiver_address][state][id]; "</p>"; ?>
+			<?php echo "<p> Estado: ". $order[shipping][receiver_address][state][name]; "</p>"; ?>
+			<?php echo "<p> Id do Pais: ". $order[shipping][receiver_address][country][id]; "</p>"; ?>
+			<?php echo "<p> Pais: ". $order[shipping][receiver_address][country][name]; "</p>"; ?>
+			
+			<?php echo "<br/>"; ?>
+			<?php echo "<br/>"; ?>
+			
+			<?php echo "-----------------------------------------------------------------------------"; ?>
+						
+			<?php echo "<br/>"; ?>
+			<?php echo "<br/>"; ?>
+			
+						
+		</li>
+		
+	
+		<?php endforeach; ?>
+	</ul>
+		
+		
+		
+	<?php else:?>
+		<div>
+			<p>Login usando OAuth 2.0:</p>
+			<a href="<?php echo $meli -> getLoginUrl(array('scope' => array('orders')));?>">Login no Mercado Livre</a>
+		</div>
+	<?php endif?>
+	
+	
+</body>
+</html>
