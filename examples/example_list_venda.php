@@ -6,10 +6,10 @@ require '../configApp.php';
 
 
 // Create our Application instance (replace this with your appId and secret).
-$meli = new Meli(array(
-	'appId'  	=> 'XXXXXXXXXXXX',
-	'secret' 	=> 'XXXXXXXXXXXXXXXXXXXX',
-));
+//$meli = new Meli(array(
+//	'appId'  	=> 'XXXXXXXXXXXX',
+//	'secret' 	=> 'XXXXXXXXXXXXXXXXXXXX',
+//));
 
 $userId = $meli -> initConnect();
 
