@@ -15,7 +15,7 @@ $meli = new Meli($appId, $secretKey);
 if($_GET['code']) {
 	
 	// If the code was in get parameter we authorize
-	$user = $meli->authorize($_GET['code'], $redirectURI);
+	$user = $meli->authorize($_GET['code'], 'https://meli2fisec.herokuapp.com/examples/example_list_venda.php');
 	
 	// Now we create the sessions with the authenticated user
 	$_SESSION['access_token'] = $user['body']->access_token;
