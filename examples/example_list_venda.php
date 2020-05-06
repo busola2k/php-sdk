@@ -10,7 +10,7 @@ require '../configApp.php';
 //	'appId'  	=> 'XXXXXXXXXXXX',
 //	'secret' 	=> 'XXXXXXXXXXXXXXXXXXXX',
 //));
-$meli = new Meli($appId, $secretKey,$_SESSION['access_token'],$_SESSION['refrsh_token']);
+$meli = new Meli($appId, $secretKey);
 
 if($_GET['code']) {
 	
@@ -36,7 +36,7 @@ if($_GET['code']) {
 	echo '</pre>';
 
 } else {
-	echo '<a href="' . $meli->getAuthUrl('https://meli2fisec.herokuapp.com/examples/example_list_venda.php', Meli::$AUTH_URL[$siteId]) . '">Login using MercadoLibre oAuth 2.0</a>';
+	echo '<a href="' . $meli->getAuthUrl('https://meli2fisec.herokuapp.com/examples/example_list_venda.php') . '">Login using MercadoLibre oAuth 2.0</a>';
 }
 
 // Login or logout url will be needed depending on current user state.
