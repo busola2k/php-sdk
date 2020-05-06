@@ -10,7 +10,7 @@ require '../configApp.php';
 //	'appId'  	=> 'XXXXXXXXXXXX',
 //	'secret' 	=> 'XXXXXXXXXXXXXXXXXXXX',
 //));
-$meli = new Meli($appId, $secretKey);
+$meli = new Meli($appId, $secretKey,$_SESSION['access_token'],$_SESSION['refrsh_token']);
 
 if($_GET['code']) {
 	
