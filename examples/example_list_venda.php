@@ -43,7 +43,7 @@ if(isset($_GET['code']) || isset($_SESSION['access_token'])) {
     
     //print_r($);
 	echo '<pre>';
-		print_r($vendas['body']['results']);
+		print_r($vendas['body']->results);
     echo '</pre>';
     
 
