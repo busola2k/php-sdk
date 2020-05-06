@@ -41,9 +41,9 @@ if(isset($_GET['code']) || isset($_SESSION['access_token'])) {
     $user_id = $user[body]->id; 
     $vendas = $meli->get('/orders/search/recent', array('access_token' => $_SESSION['access_token'], 'sort' =>'date_desc', 'seller' => $user_id)); 
     
-    print_r($vendas);
+    //print_r($);
 	echo '<pre>';
-		print_r($_SESSION);
+		print_r($vendas);
     echo '</pre>';
     
 
