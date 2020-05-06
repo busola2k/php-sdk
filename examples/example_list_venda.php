@@ -45,9 +45,9 @@ if(isset($_GET['code']) || isset($_SESSION['access_token'])) {
 		}
 	}
 
-	echo '<pre>';
-		print_r($_SESSION);
-	echo '</pre>';
+	//echo '<pre>';
+		//print_r($_SESSION);
+	//echo '</pre>';
 
 } else {
 	echo '<a href="' . $meli->getAuthUrl($redirectURI, Meli::$AUTH_URL[$siteId]) . '">Login using MercadoLibre oAuth 2.0</a>';
@@ -108,7 +108,7 @@ if ($_SESSION['access_token'] ){
 			<?php echo "<p> Id da Categoria: ". $order[order_items][0][item][category_id]; "</p>"; ?>
 			<?php echo "<p> Quantidade: ". $order[order_items][0][quantity]; "</p>"; ?>
 			<?php echo "<p> Preço do Produto: ". $order[order_items][0][unit_price]; "</p>"; ?>
-			<?php echo "<p> Total do pedido: ". $order[total_amount]; "</p>"; ?>
+			<?php echo "<p>x     Total do pedido: ". $order[total_amount]; "</p>"; ?>
 			
 			<p><b>Informações do Cliente</b></p>
 			<?php echo "<p> Id do Cliente: ". $order[buyer][id]; "</p>"; ?>
