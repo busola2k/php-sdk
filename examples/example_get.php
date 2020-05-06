@@ -6,7 +6,7 @@ $meli = new Meli($appId, $secretKey);
 
 $params = array();
 
-$url = '/orders/' . $siteId;
+$url = '/sites/' . $siteId;
 
 $result = $meli->get($url, $params);
 
