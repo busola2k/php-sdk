@@ -66,7 +66,7 @@ if(isset($_GET['code']) || isset($_SESSION['access_token'])) {
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($vendas->body->results as $venda): ?>
+            <?php foreach ($vendas[body][results] as $venda): ?>
                 <tr>
                     <th scope="row"><?php echo $venda->id ?></th>
                     <td><?php echo $venda->status ?></td>
