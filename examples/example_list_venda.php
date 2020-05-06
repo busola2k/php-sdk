@@ -40,7 +40,7 @@ if($_GET['code']) {
 }
 
 // Login or logout url will be needed depending on current user state.
-if ($user['body']->access_token){
+if ($_SESSION['access_token'] ){
 	
 	if(isset($_REQUEST['orders_id']) == 1):
 
