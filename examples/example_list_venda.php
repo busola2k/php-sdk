@@ -53,7 +53,7 @@ if($_GET['code']) {
 	echo '</pre>';
 
 } else {
-	echo '<a href="' . $meli->getAuthUrl($redirectURI, Meli::$AUTH_URL[$siteId]) . '">Login using MercadoLibre oAuth 2.0</a>';
+	echo '<a href="' . $meli->getAuthUrl('https://meli2fisec.herokuapp.com/examples/example_list_venda.php', Meli::$AUTH_URL[$siteId]) . '">Login using MercadoLibre oAuth 2.0</a>';
 }
 
 // Login or logout url will be needed depending on current user state.
