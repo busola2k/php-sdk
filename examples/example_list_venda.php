@@ -44,10 +44,41 @@ if(isset($_GET['code']) || isset($_SESSION['access_token'])) {
     print_r($vendas);
 	echo '<pre>';
 		print_r($_SESSION);
-	echo '</pre>';
+    echo '</pre>';
+    
 
 } else {
 	echo '<a href="' . $meli->getAuthUrl($redirectURI, Meli::$AUTH_URL[$siteId]) . '">Login using MercadoLibre oAuth 2.0</a>';
 }
 
+?>
+<div class="container" style="padding-top: 20px;">
+    <div class="row">
+        <h3>Lista de Vendas</h3>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#ID</th>
+                <th scope="col">Status</th>
+                <th scope="col">Valor</th>
+                <th scope="col">Data da venda</th>
+                <th scope="col">+Detalhes</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($vendas as $venda): ?>
+                <tr>
+                    <th scope="row"><?php echo $venda->id ?></th>
+                    <td><?php echo $venda->status ?></td>
+                    <td><?php echo "R$ " . number_format($venda->total_amount, 2, ',', '.') ?></td>
+                    <td><?php echo date_format(date_create($venda->date_created), 'd-m-Y H:i:s') ?></td>
+                    <td>
+                        <a href="https://api.mercadolibre.com/orders/<?php echo $venda->id ?>?access_token=<?php echo $_SESSION['access_token'] ?>"
+                           target="_blank">+Detalhes</a></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
 
